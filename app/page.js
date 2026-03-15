@@ -1,368 +1,394 @@
-"use client";
+* {
+  box-sizing: border-box;
+}
 
-import { useMemo, useState } from "react";
+html {
+  scroll-behavior: smooth;
+}
 
-const content = {
-  pt: {
-    langName: "Português",
-    heroTitle: "Dream Studio Grenchen",
-    heroSubtitle: "Fotografia profissional em Grenchen especializada em retratos, casamentos e sessões de estúdio.",
-    heroText:
-      "Retratos, casamentos, batizados, sessões exteriores, fotografia de estúdio e paisagens em Grenchen.",
-    navPortfolio: "Portfólio",
-    navPrices: "Preços",
-    navBooking: "Reserva",
-    navContact: "Contacto",
-    portfolioTitle: "Portfólio",
-    portfolioText:
-      "O site está preparado para retratos, casamentos, família, gravidez e paisagens.",
-    pricesTitle: "Preços",
-    bookingTitle: "Reserva",
-    bookingText:
-      "Peça orçamento ou deixe uma mensagem para marcar a sua sessão.",
-    contactTitle: "Contacto",
-    categories: ["Estúdio", "Exterior", "Casamentos", "Batizados", "Paisagens"],
-    priceGroups: [
-      {
-        title: "Fotografia de Estúdio",
-        items: [
-          "Mini Sessão — 120 CHF",
-          "Sessão Basic — 190 CHF",
-          "Sessão Premium — 320 CHF",
-          "Sessão Profissional — 450 CHF"
-        ]
-      },
-      {
-        title: "Sessões Fora de Estúdio",
-        items: [
-          "Sessão Exterior Mini — 160 CHF",
-          "Sessão Exterior Basic — 260 CHF",
-          "Sessão Exterior Premium — 390 CHF",
-          "Sessão Lifestyle — 520 CHF"
-        ]
-      },
-      {
-        title: "Casamentos",
-        items: [
-          "Cerimónia — 550 CHF",
-          "Meio Dia — 1100 CHF",
-          "Dia Completo — 1950 CHF",
-          "Luxury — 2600 CHF"
-        ]
-      },
-      {
-        title: "Batizados",
-        items: [
-          "Cerimónia — 350 CHF",
-          "Cerimónia + Retratos — 480 CHF",
-          "Reportagem Completa — 690 CHF"
-        ]
-      },
-      {
-        title: "Deslocação",
-        items: [
-          "Até 20 km — Grátis",
-          "20–50 km — 0.80 CHF/km",
-          "50–100 km — 0.90 CHF/km",
-          "+100 km — 1.00 CHF/km"
-        ]
-      }
-    ],
-    formName: "Nome",
-    formEmail: "Email",
-    formPhone: "Telefone",
-    formMessage: "Mensagem",
-    formButton: "Enviar pedido"
-  },
-  de: {
-    langName: "Deutsch",
-    heroTitle: "Dream Studio Grenchen",
-    heroSubtitle: "Premium-Fotografie mit klarem und elegantem Stil.",
-    heroText:
-      "Portraits, Hochzeiten, Taufen, Outdoor-Shootings, Studiofotografie und Landschaften in Grenchen.",
-    portfolioTitle: "Portfolio",
-    portfolioText:
-      "Die Website ist für Portraits, Hochzeiten, Familie, Schwangerschaft und Landschaften vorbereitet.",
-    pricesTitle: "Preise",
-    bookingTitle: "Reservierung",
-    bookingText:
-      "Fordern Sie ein Angebot an oder senden Sie eine Nachricht für Ihre Buchung.",
-    contactTitle: "Kontakt",
-    categories: ["Studio", "Outdoor", "Hochzeiten", "Taufen", "Landschaften"],
-    priceGroups: [
-      {
-        title: "Studiofotografie",
-        items: [
-          "Mini Session — 120 CHF",
-          "Basic Session — 190 CHF",
-          "Premium Session — 320 CHF",
-          "Professionelle Session — 450 CHF"
-        ]
-      },
-      {
-        title: "Outdoor-Shootings",
-        items: [
-          "Outdoor Mini — 160 CHF",
-          "Outdoor Basic — 260 CHF",
-          "Outdoor Premium — 390 CHF",
-          "Lifestyle Session — 520 CHF"
-        ]
-      },
-      {
-        title: "Hochzeiten",
-        items: [
-          "Zeremonie — 550 CHF",
-          "Halber Tag — 1100 CHF",
-          "Ganzer Tag — 1950 CHF",
-          "Luxury — 2600 CHF"
-        ]
-      },
-      {
-        title: "Taufen",
-        items: [
-          "Zeremonie — 350 CHF",
-          "Zeremonie + Portraits — 480 CHF",
-          "Komplette Reportage — 690 CHF"
-        ]
-      },
-      {
-        title: "Anfahrt",
-        items: [
-          "Bis 20 km — Kostenlos",
-          "20–50 km — 0.80 CHF/km",
-          "50–100 km — 0.90 CHF/km",
-          "+100 km — 1.00 CHF/km"
-        ]
-      }
-    ],
-    formName: "Name",
-    formEmail: "E-Mail",
-    formPhone: "Telefon",
-    formMessage: "Nachricht",
-    formButton: "Anfrage senden"
-  },
-  fr: {
-    langName: "Français",
-    heroTitle: "Dream Studio Grenchen",
-    heroSubtitle: "Photographie premium avec un style propre et élégant.",
-    heroText:
-      "Portraits, mariages, baptêmes, séances extérieures, studio et paysages à Grenchen.",
-    portfolioTitle: "Portfolio",
-    portfolioText:
-      "Le site est prêt pour les portraits, mariages, famille, grossesse et paysages.",
-    pricesTitle: "Tarifs",
-    bookingTitle: "Réservation",
-    bookingText:
-      "Demandez un devis ou laissez un message pour réserver votre séance.",
-    contactTitle: "Contact",
-    categories: ["Studio", "Extérieur", "Mariages", "Baptêmes", "Paysages"],
-    priceGroups: [
-      {
-        title: "Photographie Studio",
-        items: [
-          "Mini Séance — 120 CHF",
-          "Séance Basic — 190 CHF",
-          "Séance Premium — 320 CHF",
-          "Séance Professionnelle — 450 CHF"
-        ]
-      },
-      {
-        title: "Séances Extérieures",
-        items: [
-          "Extérieur Mini — 160 CHF",
-          "Extérieur Basic — 260 CHF",
-          "Extérieur Premium — 390 CHF",
-          "Lifestyle — 520 CHF"
-        ]
-      },
-      {
-        title: "Mariages",
-        items: [
-          "Cérémonie — 550 CHF",
-          "Demi-journée — 1100 CHF",
-          "Journée complète — 1950 CHF",
-          "Luxury — 2600 CHF"
-        ]
-      },
-      {
-        title: "Baptêmes",
-        items: [
-          "Cérémonie — 350 CHF",
-          "Cérémonie + Portraits — 480 CHF",
-          "Reportage complet — 690 CHF"
-        ]
-      },
-      {
-        title: "Déplacement",
-        items: [
-          "Jusqu'à 20 km — Gratuit",
-          "20–50 km — 0.80 CHF/km",
-          "50–100 km — 0.90 CHF/km",
-          "+100 km — 1.00 CHF/km"
-        ]
-      }
-    ],
-    formName: "Nom",
-    formEmail: "Email",
-    formPhone: "Téléphone",
-    formMessage: "Message",
-    formButton: "Envoyer la demande"
-  },
-  it: {
-    langName: "Italiano",
-    heroTitle: "Dream Studio Grenchen",
-    heroSubtitle: "Fotografia premium con stile pulito ed elegante.",
-    heroText:
-      "Ritratti, matrimoni, battesimi, sessioni esterne, studio fotografico e paesaggi a Grenchen.",
-    portfolioTitle: "Portfolio",
-    portfolioText:
-      "Il sito è pronto per ritratti, matrimoni, famiglia, gravidanza e paesaggi.",
-    pricesTitle: "Prezzi",
-    bookingTitle: "Prenotazione",
-    bookingText:
-      "Richieda un preventivo o lasci un messaggio per prenotare la sua sessione.",
-    contactTitle: "Contatto",
-    categories: ["Studio", "Esterno", "Matrimoni", "Battesimi", "Paesaggi"],
-    priceGroups: [
-      {
-        title: "Fotografia in Studio",
-        items: [
-          "Mini Sessione — 120 CHF",
-          "Sessione Basic — 190 CHF",
-          "Sessione Premium — 320 CHF",
-          "Sessione Professionale — 450 CHF"
-        ]
-      },
-      {
-        title: "Sessioni Esterne",
-        items: [
-          "Esterno Mini — 160 CHF",
-          "Esterno Basic — 260 CHF",
-          "Esterno Premium — 390 CHF",
-          "Lifestyle — 520 CHF"
-        ]
-      },
-      {
-        title: "Matrimoni",
-        items: [
-          "Cerimonia — 550 CHF",
-          "Mezza Giornata — 1100 CHF",
-          "Giornata Completa — 1950 CHF",
-          "Luxury — 2600 CHF"
-        ]
-      },
-      {
-        title: "Battesimi",
-        items: [
-          "Cerimonia — 350 CHF",
-          "Cerimonia + Ritratti — 480 CHF",
-          "Reportage Completo — 690 CHF"
-        ]
-      },
-      {
-        title: "Spostamento",
-        items: [
-          "Fino a 20 km — Gratis",
-          "20–50 km — 0.80 CHF/km",
-          "50–100 km — 0.90 CHF/km",
-          "+100 km — 1.00 CHF/km"
-        ]
-      }
-    ],
-    formName: "Nome",
-    formEmail: "Email",
-    formPhone: "Telefono",
-    formMessage: "Messaggio",
-    formButton: "Invia richiesta"
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #111111;
+  color: #f3f0e8;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+select,
+input {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.site-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(212, 186, 132, 0.08), transparent 30%),
+    linear-gradient(180deg, #111111 0%, #161616 100%);
+}
+
+.page-container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.brand-mini {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.brand-owner {
+  margin: 2px 0 0;
+  color: #d7c59b;
+  font-size: 0.9rem;
+}
+
+.lang-switch {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.lang-btn {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: #f3f0e8;
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.lang-btn:hover,
+.lang-btn.active {
+  background: #d7c59b;
+  color: #111111;
+  border-color: #d7c59b;
+}
+
+.hero-card,
+.section-card {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 24px;
+  padding: 28px;
+  margin-bottom: 22px;
+  backdrop-filter: blur(6px);
+}
+
+.section-kicker {
+  margin: 0 0 8px;
+  color: #d7c59b;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.hero-text h1 {
+  margin: 0 0 10px;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  line-height: 1;
+}
+
+.hero-text h2 {
+  margin: 0 0 14px;
+  color: #ead8ad;
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  line-height: 1.3;
+}
+
+.hero-text p {
+  margin: 0;
+  max-width: 900px;
+  color: #ddd7ca;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+
+.primary-btn,
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 14px;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.primary-btn {
+  background: #d7c59b;
+  color: #111111;
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.94;
+}
+
+.secondary-btn {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f3f0e8;
+}
+
+.secondary-btn:hover {
+  border-color: #d7c59b;
+  color: #d7c59b;
+}
+
+.section-card h3 {
+  margin: 0 0 10px;
+  font-size: 1.7rem;
+}
+
+.section-card p {
+  margin: 0 0 18px;
+  color: #ddd7ca;
+  line-height: 1.6;
+}
+
+.category-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.category-btn {
+  min-width: 140px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  color: #f3f0e8;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.category-btn:hover,
+.category-btn.active {
+  background: #d7c59b;
+  color: #111111;
+  border-color: #d7c59b;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.gallery-card {
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #1c1c1c;
+  min-height: 260px;
+}
+
+.gallery-card img {
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  object-fit: cover;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.price-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.price-card h4 {
+  margin: 0 0 12px;
+  color: #ead8ad;
+  font-size: 1.05rem;
+}
+
+.price-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #ddd7ca;
+  line-height: 1.7;
+}
+
+.simulator-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  font-weight: 700;
+  color: #ead8ad;
+}
+
+.field select {
+  min-height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #1b1b1b;
+  color: #f3f0e8;
+  padding: 0 12px;
+}
+
+.extras-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.extra-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.total-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: #d7c59b;
+  color: #111111;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.total-box strong {
+  font-size: 1.4rem;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.contact-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: 0.2s ease;
+}
+
+.contact-link:hover {
+  border-color: #d7c59b;
+  transform: translateY(-1px);
+}
+
+.contact-link span {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.contact-link strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #ead8ad;
+}
+
+.contact-link p {
+  margin: 0;
+  color: #ddd7ca;
+}
+
+.footer {
+  padding: 14px 4px;
+  text-align: center;
+  color: #bfb8aa;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 1100px) {
+  .pricing-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-};
 
-const languages = [
-  { key: "pt", label: "PT" },
-  { key: "de", label: "DE" },
-  { key: "fr", label: "FR" },
-  { key: "it", label: "IT" }
-];
+  .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 
-export default function Page() {
-  const [lang, setLang] = useState("pt");
-  const t = useMemo(() => content[lang], [lang]);
+@media (max-width: 820px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-  return (
-    <main className="page">
-      <header className="header">
-        <div>
-          <div className="brand">Dream Studio Grenchen</div>
-          <div className="subbrand">by Paulo Alves</div>
-        </div>
-        <div className="lang-switch">
-          {languages.map((item) => (
-            <button
-              key={item.key}
-              className={lang === item.key ? "lang active" : "lang"}
-              onClick={() => setLang(item.key)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </header>
+  .simulator-grid,
+  .contact-grid,
+  .pricing-grid,
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
 
-      <section className="hero">
-        <div className="hero-card">
-          <p className="eyebrow">{t.langName}</p>
-          <h1>{t.heroTitle}</h1>
-          <h2>{t.heroSubtitle}</h2>
-          <p className="hero-text">{t.heroText}</p>
-        </div>
-      </section>
+  .hero-card,
+  .section-card {
+    padding: 20px;
+    border-radius: 18px;
+  }
 
-      <section className="section">
-        <h3>{t.portfolioTitle}</h3>
-        <p>{t.portfolioText}</p>
-        <div className="grid">
-          {t.categories.map((item) => (
-            <div key={item} className="card">
-              <strong>{item}</strong>
-            </div>
-          ))}
-        </div>
-      </section>
+  .category-btn {
+    width: 100%;
+  }
 
-      <section className="section">
-        <h3>{t.pricesTitle}</h3>
-        <div className="prices">
-          {t.priceGroups.map((group) => (
-            <div key={group.title} className="price-card">
-              <h4>{group.title}</h4>
-              <ul>
-                {group.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="section">
-        <h3>{t.bookingTitle}</h3>
-        <p>{t.bookingText}</p>
-        <form className="form">
-          <input placeholder={t.formName} />
-          <input placeholder={t.formEmail} />
-          <input placeholder={t.formPhone} />
-          <textarea placeholder={t.formMessage} rows="5" />
-          <button type="button">{t.formButton}</button>
-        </form>
-      </section>
-
-      <section className="section">
-        <h3>{t.contactTitle}</h3>
-        <p>079 334 77 99</p>
-        <p>info@dreamstudiogrenchen.ch</p>
-        <p>Grenchen, Schweiz</p>
-      </section>
-    </main>
-  );
+  .total-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
