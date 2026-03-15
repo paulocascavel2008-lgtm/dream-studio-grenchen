@@ -26,7 +26,7 @@ const translations = {
     },
     pricesTitle: "Preços",
     pricesText:
-      "Valores base orientativos. O simulador abaixo ajuda a estimar o preço final.",
+      "Clique num cartão para ver o que cada serviço inclui.",
     simulatorTitle: "Simulador de Preços",
     simulatorText: "Escolha as opções para obter uma estimativa rápida.",
     aboutTitle: "Sobre Mim",
@@ -50,6 +50,10 @@ const translations = {
       extraPhotos: "5 fotos extra",
       express: "Entrega rápida",
       album: "Álbum",
+      noTravel: "Sem deslocação",
+      upTo20: "Até 20 km",
+      from20to50: "20–50 km",
+      over50: "+50 km",
     },
   },
 
@@ -75,7 +79,7 @@ const translations = {
     },
     pricesTitle: "Preise",
     pricesText:
-      "Basispreise zur Orientierung. Der Simulator unten hilft bei einer schnellen Schätzung.",
+      "Klicken Sie auf eine Karte, um die enthaltenen Leistungen zu sehen.",
     simulatorTitle: "Preis-Simulator",
     simulatorText:
       "Wählen Sie die Optionen, um schnell einen Richtpreis zu erhalten.",
@@ -100,6 +104,10 @@ const translations = {
       extraPhotos: "5 zusätzliche Fotos",
       express: "Express-Lieferung",
       album: "Album",
+      noTravel: "Keine Anfahrt",
+      upTo20: "Bis 20 km",
+      from20to50: "20–50 km",
+      over50: "+50 km",
     },
   },
 
@@ -125,7 +133,7 @@ const translations = {
     },
     pricesTitle: "Tarifs",
     pricesText:
-      "Tarifs indicatifs de base. Le simulateur ci-dessous aide à estimer le prix final.",
+      "Cliquez sur une carte pour voir ce qui est inclus.",
     simulatorTitle: "Simulateur de Prix",
     simulatorText:
       "Choisissez les options pour obtenir rapidement une estimation.",
@@ -150,6 +158,10 @@ const translations = {
       extraPhotos: "5 photos supplémentaires",
       express: "Livraison express",
       album: "Album",
+      noTravel: "Sans déplacement",
+      upTo20: "Jusqu’à 20 km",
+      from20to50: "20–50 km",
+      over50: "+50 km",
     },
   },
 
@@ -175,7 +187,7 @@ const translations = {
     },
     pricesTitle: "Prezzi",
     pricesText:
-      "Prezzi base indicativi. Il simulatore qui sotto aiuta a stimare il prezzo finale.",
+      "Clicca su una scheda per vedere cosa è incluso.",
     simulatorTitle: "Simulatore Prezzi",
     simulatorText:
       "Scegli le opzioni per ottenere rapidamente una stima.",
@@ -200,6 +212,10 @@ const translations = {
       extraPhotos: "5 foto extra",
       express: "Consegna rapida",
       album: "Album",
+      noTravel: "Senza spostamento",
+      upTo20: "Fino a 20 km",
+      from20to50: "20–50 km",
+      over50: "+50 km",
     },
   },
 };
@@ -225,12 +241,64 @@ const extraPrices = {
   album: 120,
 };
 
+const pricingDetails = {
+  studio: {
+    title: "Studio",
+    priceLines: ["Mini — 120 CHF", "Basic — 190 CHF", "Premium — 320 CHF"],
+    details: [
+      "Mini: cerca de 30 minutos, 5 fotos editadas.",
+      "Basic: cerca de 1 hora, 10 fotos editadas.",
+      "Premium: cerca de 1h30, 20 fotos editadas.",
+      "Entrega digital incluída.",
+      "Fotos extra disponíveis à parte.",
+    ],
+  },
+  outdoor: {
+    title: "Outdoor",
+    priceLines: ["Mini — 160 CHF", "Basic — 260 CHF", "Premium — 320 CHF"],
+    details: [
+      "Sessão no exterior em local combinado.",
+      "Mini: sessão curta e objetiva.",
+      "Basic: mais variedade de poses e enquadramentos.",
+      "Premium: sessão mais longa e seleção mais completa.",
+      "Deslocação pode ser adicionada conforme distância.",
+    ],
+  },
+  wedding: {
+    title: "Wedding",
+    priceLines: [
+      "Half day — 1100 CHF",
+      "Full day — 1950 CHF",
+      "Luxury — 2600 CHF",
+    ],
+    details: [
+      "Half day: cobertura parcial do casamento.",
+      "Full day: cobertura completa do dia principal.",
+      "Luxury: cobertura mais extensa e serviço premium.",
+      "Entrega digital incluída.",
+      "Álbuns e extras podem ser adicionados.",
+    ],
+  },
+  baptism: {
+    title: "Baptism",
+    priceLines: ["Mini — 350 CHF", "Basic — 480 CHF", "Premium — 690 CHF"],
+    details: [
+      "Cobertura da cerimónia e retratos conforme pacote.",
+      "Mini: essencial.",
+      "Basic: cerimónia + mais retratos.",
+      "Premium: cobertura mais completa.",
+      "Entrega digital incluída.",
+    ],
+  },
+};
+
 export default function Page() {
   const [lang, setLang] = useState("pt");
   const [activeCategory, setActiveCategory] = useState("studio");
   const [service, setService] = useState("studio");
   const [pkg, setPkg] = useState("mini");
   const [distance, setDistance] = useState("none");
+  const [openPrice, setOpenPrice] = useState(null);
   const [extras, setExtras] = useState({
     extraPhotos: false,
     express: false,
@@ -340,41 +408,31 @@ export default function Page() {
           <p>{t.pricesText}</p>
 
           <div className="pricing-grid">
-            <div className="price-card">
-              <h4>Studio</h4>
-              <ul>
-                <li>Mini — 120 CHF</li>
-                <li>Basic — 190 CHF</li>
-                <li>Premium — 320 CHF</li>
-              </ul>
-            </div>
+            {Object.entries(pricingDetails).map(([key, item]) => (
+              <button
+                key={key}
+                type="button"
+                className={`price-card clickable-card ${
+                  openPrice === key ? "active" : ""
+                }`}
+                onClick={() => setOpenPrice(openPrice === key ? null : key)}
+              >
+                <h4>{item.title}</h4>
+                <ul>
+                  {item.priceLines.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
 
-            <div className="price-card">
-              <h4>Outdoor</h4>
-              <ul>
-                <li>Mini — 160 CHF</li>
-                <li>Basic — 260 CHF</li>
-                <li>Premium — 320 CHF</li>
-              </ul>
-            </div>
-
-            <div className="price-card">
-              <h4>Wedding</h4>
-              <ul>
-                <li>Half day — 1100 CHF</li>
-                <li>Full day — 1950 CHF</li>
-                <li>Luxury — 2600 CHF</li>
-              </ul>
-            </div>
-
-            <div className="price-card">
-              <h4>Baptism</h4>
-              <ul>
-                <li>Mini — 350 CHF</li>
-                <li>Basic — 480 CHF</li>
-                <li>Premium — 690 CHF</li>
-              </ul>
-            </div>
+                {openPrice === key && (
+                  <div className="price-details">
+                    {item.details.map((detail) => (
+                      <p key={detail}>{detail}</p>
+                    ))}
+                  </div>
+                )}
+              </button>
+            ))}
           </div>
         </section>
 
@@ -418,10 +476,10 @@ export default function Page() {
                 value={distance}
                 onChange={(e) => setDistance(e.target.value)}
               >
-                <option value="none">Sem deslocação</option>
-                <option value="short">Até 20 km</option>
-                <option value="medium">20–50 km</option>
-                <option value="long">+50 km</option>
+                <option value="none">{t.simulator.noTravel}</option>
+                <option value="short">{t.simulator.upTo20}</option>
+                <option value="medium">{t.simulator.from20to50}</option>
+                <option value="long">{t.simulator.over50}</option>
               </select>
             </div>
           </div>
