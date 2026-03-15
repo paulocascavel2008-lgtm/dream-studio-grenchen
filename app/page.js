@@ -25,8 +25,7 @@ const translations = {
       family: "Família",
     },
     pricesTitle: "Preços",
-    pricesText:
-      "Clique num cartão para ver o que cada serviço inclui.",
+    pricesText: "Clique num cartão para ver o que cada serviço inclui.",
     simulatorTitle: "Simulador de Preços",
     simulatorText: "Escolha as opções para obter uma estimativa rápida.",
     aboutTitle: "Sobre Mim",
@@ -42,6 +41,7 @@ const translations = {
       website: "Website",
     },
     footer: "Dream Studio Grenchen • Paulo Alves",
+    close: "Fechar",
     simulator: {
       service: "Serviço",
       package: "Pacote",
@@ -78,8 +78,7 @@ const translations = {
       family: "Familie",
     },
     pricesTitle: "Preise",
-    pricesText:
-      "Klicken Sie auf eine Karte, um die enthaltenen Leistungen zu sehen.",
+    pricesText: "Klicken Sie auf eine Karte, um die enthaltenen Leistungen zu sehen.",
     simulatorTitle: "Preis-Simulator",
     simulatorText:
       "Wählen Sie die Optionen, um schnell einen Richtpreis zu erhalten.",
@@ -96,6 +95,7 @@ const translations = {
       website: "Website",
     },
     footer: "Dream Studio Grenchen • Paulo Alves",
+    close: "Schließen",
     simulator: {
       service: "Service",
       package: "Paket",
@@ -132,8 +132,7 @@ const translations = {
       family: "Famille",
     },
     pricesTitle: "Tarifs",
-    pricesText:
-      "Cliquez sur une carte pour voir ce qui est inclus.",
+    pricesText: "Cliquez sur une carte pour voir ce qui est inclus.",
     simulatorTitle: "Simulateur de Prix",
     simulatorText:
       "Choisissez les options pour obtenir rapidement une estimation.",
@@ -150,6 +149,7 @@ const translations = {
       website: "Site web",
     },
     footer: "Dream Studio Grenchen • Paulo Alves",
+    close: "Fermer",
     simulator: {
       service: "Service",
       package: "Forfait",
@@ -186,8 +186,7 @@ const translations = {
       family: "Famiglia",
     },
     pricesTitle: "Prezzi",
-    pricesText:
-      "Clicca su una scheda per vedere cosa è incluso.",
+    pricesText: "Clicca su una scheda per vedere cosa è incluso.",
     simulatorTitle: "Simulatore Prezzi",
     simulatorText:
       "Scegli le opzioni per ottenere rapidamente una stima.",
@@ -204,6 +203,7 @@ const translations = {
       website: "Sito web",
     },
     footer: "Dream Studio Grenchen • Paulo Alves",
+    close: "Chiudi",
     simulator: {
       service: "Servizio",
       package: "Pacchetto",
@@ -299,6 +299,7 @@ export default function Page() {
   const [pkg, setPkg] = useState("mini");
   const [distance, setDistance] = useState("none");
   const [openPrice, setOpenPrice] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [extras, setExtras] = useState({
     extraPhotos: false,
     express: false,
@@ -332,251 +333,276 @@ export default function Page() {
   const siteLink = "https://www.dreamstudiogrenchen.ch";
 
   return (
-    <main className="site-shell">
-      <div className="page-container">
-        <header className="topbar">
-          <div>
-            <p className="brand-mini">Dream Studio Grenchen</p>
-            <p className="brand-owner">by Paulo Alves</p>
-          </div>
+    <>
+      <main className="site-shell">
+        <div className="page-container">
+          <header className="topbar">
+            <div>
+              <p className="brand-mini">Dream Studio Grenchen</p>
+              <p className="brand-owner">by Paulo Alves</p>
+            </div>
 
-          <div className="lang-switch">
-            {["pt", "de", "fr", "it"].map((code) => (
-              <button
-                key={code}
-                className={`lang-btn ${lang === code ? "active" : ""}`}
-                onClick={() => setLang(code)}
-              >
-                {code.toUpperCase()}
-              </button>
-            ))}
-          </div>
-        </header>
+            <div className="lang-switch">
+              {["pt", "de", "fr", "it"].map((code) => (
+                <button
+                  key={code}
+                  className={`lang-btn ${lang === code ? "active" : ""}`}
+                  onClick={() => setLang(code)}
+                >
+                  {code.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </header>
 
-        <section className="hero-card">
-          <div className="hero-text">
-            <p className="section-kicker">{t.langLabel}</p>
-            <h1>{t.heroTitle}</h1>
-            <h2>{t.heroSubtitle}</h2>
-            <p>{t.heroText}</p>
+          <section className="hero-card">
+            <div className="hero-text">
+              <p className="section-kicker">{t.langLabel}</p>
+              <h1>{t.heroTitle}</h1>
+              <h2>{t.heroSubtitle}</h2>
+              <p>{t.heroText}</p>
 
-            <div className="hero-actions">
+              <div className="hero-actions">
+                <a
+                  className="primary-btn"
+                  href={whatsappLink}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  💬 {t.whatsapp}
+                </a>
+                <a className="secondary-btn" href="#kontakt">
+                  {t.contact}
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <section className="section-card">
+            <h3>{t.portfolioTitle}</h3>
+            <p>{t.portfolioText}</p>
+
+            <div className="category-row">
+              {Object.entries(t.categories).map(([key, label]) => (
+                <button
+                  key={key}
+                  className={`category-btn ${
+                    activeCategory === key ? "active" : ""
+                  }`}
+                  onClick={() => setActiveCategory(key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="gallery-grid">
+              {portfolioData[activeCategory]?.map((src, index) => (
+                <button
+                  type="button"
+                  className="gallery-card gallery-button"
+                  key={`${src}-${index}`}
+                  onClick={() => setSelectedImage(src)}
+                >
+                  <img src={src} alt={`${activeCategory}-${index + 1}`} />
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="section-card">
+            <h3>{t.pricesTitle}</h3>
+            <p>{t.pricesText}</p>
+
+            <div className="pricing-grid">
+              {Object.entries(pricingDetails).map(([key, item]) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={`price-card clickable-card ${
+                    openPrice === key ? "active" : ""
+                  }`}
+                  onClick={() => setOpenPrice(openPrice === key ? null : key)}
+                >
+                  <h4>{item.title}</h4>
+                  <ul>
+                    {item.priceLines.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+
+                  {openPrice === key && (
+                    <div className="price-details">
+                      {item.details.map((detail) => (
+                        <p key={detail}>{detail}</p>
+                      ))}
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="section-card">
+            <h3>{t.simulatorTitle}</h3>
+            <p>{t.simulatorText}</p>
+
+            <div className="simulator-grid">
+              <div className="field">
+                <label>{t.simulator.service}</label>
+                <select
+                  value={service}
+                  onChange={(e) => {
+                    const newService = e.target.value;
+                    setService(newService);
+                    setPkg(newService === "wedding" ? "half" : "mini");
+                  }}
+                >
+                  <option value="studio">Studio</option>
+                  <option value="outdoor">Outdoor</option>
+                  <option value="wedding">Wedding</option>
+                  <option value="baptism">Baptism</option>
+                  <option value="family">Family</option>
+                </select>
+              </div>
+
+              <div className="field">
+                <label>{t.simulator.package}</label>
+                <select value={pkg} onChange={(e) => setPkg(e.target.value)}>
+                  {availablePackages.map((key) => (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="field">
+                <label>{t.simulator.distance}</label>
+                <select
+                  value={distance}
+                  onChange={(e) => setDistance(e.target.value)}
+                >
+                  <option value="none">{t.simulator.noTravel}</option>
+                  <option value="short">{t.simulator.upTo20}</option>
+                  <option value="medium">{t.simulator.from20to50}</option>
+                  <option value="long">{t.simulator.over50}</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="extras-grid">
+              <label className="extra-item">
+                <input
+                  type="checkbox"
+                  checked={extras.extraPhotos}
+                  onChange={() => handleExtraToggle("extraPhotos")}
+                />
+                <span>{t.simulator.extraPhotos}</span>
+              </label>
+
+              <label className="extra-item">
+                <input
+                  type="checkbox"
+                  checked={extras.express}
+                  onChange={() => handleExtraToggle("express")}
+                />
+                <span>{t.simulator.express}</span>
+              </label>
+
+              <label className="extra-item">
+                <input
+                  type="checkbox"
+                  checked={extras.album}
+                  onChange={() => handleExtraToggle("album")}
+                />
+                <span>{t.simulator.album}</span>
+              </label>
+            </div>
+
+            <div className="total-box">
+              <span>{t.simulator.total}</span>
+              <strong>{total} CHF</strong>
+            </div>
+          </section>
+
+          <section className="section-card">
+            <h3>{t.aboutTitle}</h3>
+            <p>{t.aboutText}</p>
+          </section>
+
+          <section className="section-card" id="kontakt">
+            <h3>{t.contactTitle}</h3>
+            <p>{t.contactText}</p>
+
+            <div className="contact-grid">
+              <a href={phoneLink} className="contact-link">
+                <span>📞</span>
+                <div>
+                  <strong>{t.clickable.phone}</strong>
+                  <p>+41 79 334 77 99</p>
+                </div>
+              </a>
+
+              <a href={emailLink} className="contact-link">
+                <span>📧</span>
+                <div>
+                  <strong>{t.clickable.email}</strong>
+                  <p>info@dreamstudiogrenchen.ch</p>
+                </div>
+              </a>
+
               <a
-                className="primary-btn"
                 href={whatsappLink}
                 target="_blank"
                 rel="noreferrer"
+                className="contact-link"
               >
-                💬 {t.whatsapp}
+                <span>💬</span>
+                <div>
+                  <strong>{t.clickable.whatsapp}</strong>
+                  <p>Chat direto</p>
+                </div>
               </a>
-              <a className="secondary-btn" href="#kontakt">
-                {t.contact}
+
+              <a
+                href={siteLink}
+                target="_blank"
+                rel="noreferrer"
+                className="contact-link"
+              >
+                <span>🌐</span>
+                <div>
+                  <strong>{t.clickable.website}</strong>
+                  <p>www.dreamstudiogrenchen.ch</p>
+                </div>
               </a>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section className="section-card">
-          <h3>{t.portfolioTitle}</h3>
-          <p>{t.portfolioText}</p>
+          <footer className="footer">
+            <p>{t.footer}</p>
+          </footer>
+        </div>
+      </main>
 
-          <div className="category-row">
-            {Object.entries(t.categories).map(([key, label]) => (
-              <button
-                key={key}
-                className={`category-btn ${
-                  activeCategory === key ? "active" : ""
-                }`}
-                onClick={() => setActiveCategory(key)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <div className="gallery-grid">
-            {portfolioData[activeCategory]?.map((src, index) => (
-              <div className="gallery-card" key={`${src}-${index}`}>
-                <img src={src} alt={`${activeCategory}-${index + 1}`} />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="section-card">
-          <h3>{t.pricesTitle}</h3>
-          <p>{t.pricesText}</p>
-
-          <div className="pricing-grid">
-            {Object.entries(pricingDetails).map(([key, item]) => (
-              <button
-                key={key}
-                type="button"
-                className={`price-card clickable-card ${
-                  openPrice === key ? "active" : ""
-                }`}
-                onClick={() => setOpenPrice(openPrice === key ? null : key)}
-              >
-                <h4>{item.title}</h4>
-                <ul>
-                  {item.priceLines.map((line) => (
-                    <li key={line}>{line}</li>
-                  ))}
-                </ul>
-
-                {openPrice === key && (
-                  <div className="price-details">
-                    {item.details.map((detail) => (
-                      <p key={detail}>{detail}</p>
-                    ))}
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="section-card">
-          <h3>{t.simulatorTitle}</h3>
-          <p>{t.simulatorText}</p>
-
-          <div className="simulator-grid">
-            <div className="field">
-              <label>{t.simulator.service}</label>
-              <select
-                value={service}
-                onChange={(e) => {
-                  const newService = e.target.value;
-                  setService(newService);
-                  setPkg(newService === "wedding" ? "half" : "mini");
-                }}
-              >
-                <option value="studio">Studio</option>
-                <option value="outdoor">Outdoor</option>
-                <option value="wedding">Wedding</option>
-                <option value="baptism">Baptism</option>
-                <option value="family">Family</option>
-              </select>
-            </div>
-
-            <div className="field">
-              <label>{t.simulator.package}</label>
-              <select value={pkg} onChange={(e) => setPkg(e.target.value)}>
-                {availablePackages.map((key) => (
-                  <option key={key} value={key}>
-                    {key}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="field">
-              <label>{t.simulator.distance}</label>
-              <select
-                value={distance}
-                onChange={(e) => setDistance(e.target.value)}
-              >
-                <option value="none">{t.simulator.noTravel}</option>
-                <option value="short">{t.simulator.upTo20}</option>
-                <option value="medium">{t.simulator.from20to50}</option>
-                <option value="long">{t.simulator.over50}</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="extras-grid">
-            <label className="extra-item">
-              <input
-                type="checkbox"
-                checked={extras.extraPhotos}
-                onChange={() => handleExtraToggle("extraPhotos")}
-              />
-              <span>{t.simulator.extraPhotos}</span>
-            </label>
-
-            <label className="extra-item">
-              <input
-                type="checkbox"
-                checked={extras.express}
-                onChange={() => handleExtraToggle("express")}
-              />
-              <span>{t.simulator.express}</span>
-            </label>
-
-            <label className="extra-item">
-              <input
-                type="checkbox"
-                checked={extras.album}
-                onChange={() => handleExtraToggle("album")}
-              />
-              <span>{t.simulator.album}</span>
-            </label>
-          </div>
-
-          <div className="total-box">
-            <span>{t.simulator.total}</span>
-            <strong>{total} CHF</strong>
-          </div>
-        </section>
-
-        <section className="section-card">
-          <h3>{t.aboutTitle}</h3>
-          <p>{t.aboutText}</p>
-        </section>
-
-        <section className="section-card" id="kontakt">
-          <h3>{t.contactTitle}</h3>
-          <p>{t.contactText}</p>
-
-          <div className="contact-grid">
-            <a href={phoneLink} className="contact-link">
-              <span>📞</span>
-              <div>
-                <strong>{t.clickable.phone}</strong>
-                <p>+41 79 334 77 99</p>
-              </div>
-            </a>
-
-            <a href={emailLink} className="contact-link">
-              <span>📧</span>
-              <div>
-                <strong>{t.clickable.email}</strong>
-                <p>info@dreamstudiogrenchen.ch</p>
-              </div>
-            </a>
-
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noreferrer"
-              className="contact-link"
+      {selectedImage && (
+        <div className="lightbox-overlay" onClick={() => setSelectedImage(null)}>
+          <div
+            className="lightbox-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="lightbox-close"
+              onClick={() => setSelectedImage(null)}
             >
-              <span>💬</span>
-              <div>
-                <strong>{t.clickable.whatsapp}</strong>
-                <p>Chat direto</p>
-              </div>
-            </a>
-
-            <a
-              href={siteLink}
-              target="_blank"
-              rel="noreferrer"
-              className="contact-link"
-            >
-              <span>🌐</span>
-              <div>
-                <strong>{t.clickable.website}</strong>
-                <p>www.dreamstudiogrenchen.ch</p>
-              </div>
-            </a>
+              × {t.close}
+            </button>
+            <img src={selectedImage} alt="portfolio-large" className="lightbox-image" />
           </div>
-        </section>
-
-        <footer className="footer">
-          <p>{t.footer}</p>
-        </footer>
-      </div>
-    </main>
+        </div>
+      )}
+    </>
   );
 }
