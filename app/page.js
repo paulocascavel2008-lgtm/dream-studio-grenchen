@@ -6,7 +6,7 @@ const content = {
   pt: {
     langName: "Português",
     heroTitle: "Dream Studio Grenchen",
-    heroSubtitle: "Fotografia premium com visual clean e elegante.",
+    heroSubtitle: "Fotografia profissional em Grenchen especializada em retratos, casamentos e sessões de estúdio.",
     heroText:
       "Retratos, casamentos, batizados, sessões exteriores, fotografia de estúdio e paisagens em Grenchen.",
     navPortfolio: "Portfólio",
