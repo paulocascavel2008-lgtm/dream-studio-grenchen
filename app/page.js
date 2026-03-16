@@ -566,7 +566,7 @@ export default function Page() {
               </div>
 
               <div className="hero-side-card">
-                <img src="/logo-dream-studio.png" alt="Dream Studio Grenchen logo" className="hero-logo" />
+                <img src="/logo-dream-studio.jpg" alt="Dream Studio Grenchen logo" className="hero-logo" />
               </div>
             </div>
           </section>
