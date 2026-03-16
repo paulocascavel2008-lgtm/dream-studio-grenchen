@@ -524,7 +524,7 @@ export default function Page() {
           <header className="topbar">
             <a href="#top" className="brand-wrap" aria-label="Dream Studio Grenchen home">
               <img
-                src="/logo-dream-studio.png"
+                src="/logo-dream-studio.jpg"
                 alt="Dream Studio Grenchen by Paulo Alves"
                 className="brand-logo"
               />
