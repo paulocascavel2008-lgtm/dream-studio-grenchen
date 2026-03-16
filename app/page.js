@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { portfolioData } from "../lib/portfolio";
 
 const translations = {
@@ -42,6 +42,8 @@ const translations = {
     },
     footer: "Dream Studio Grenchen • Paulo Alves",
     close: "Fechar",
+    previous: "Anterior",
+    next: "Seguinte",
     simulator: {
       service: "Serviço",
       package: "Pacote",
@@ -78,7 +80,8 @@ const translations = {
       family: "Familie",
     },
     pricesTitle: "Preise",
-    pricesText: "Klicken Sie auf eine Karte, um die enthaltenen Leistungen zu sehen.",
+    pricesText:
+      "Klicken Sie auf eine Karte, um die enthaltenen Leistungen zu sehen.",
     simulatorTitle: "Preis-Simulator",
     simulatorText:
       "Wählen Sie die Optionen, um schnell einen Richtpreis zu erhalten.",
@@ -96,6 +99,8 @@ const translations = {
     },
     footer: "Dream Studio Grenchen • Paulo Alves",
     close: "Schließen",
+    previous: "Zurück",
+    next: "Weiter",
     simulator: {
       service: "Service",
       package: "Paket",
@@ -150,6 +155,8 @@ const translations = {
     },
     footer: "Dream Studio Grenchen • Paulo Alves",
     close: "Fermer",
+    previous: "Précédent",
+    next: "Suivant",
     simulator: {
       service: "Service",
       package: "Forfait",
@@ -204,6 +211,8 @@ const translations = {
     },
     footer: "Dream Studio Grenchen • Paulo Alves",
     close: "Chiudi",
+    previous: "Precedente",
+    next: "Successiva",
     simulator: {
       service: "Servizio",
       package: "Pacchetto",
@@ -299,7 +308,7 @@ export default function Page() {
   const [pkg, setPkg] = useState("mini");
   const [distance, setDistance] = useState("none");
   const [openPrice, setOpenPrice] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(null);
   const [extras, setExtras] = useState({
     extraPhotos: false,
     express: false,
@@ -307,10 +316,44 @@ export default function Page() {
   });
 
   const t = translations[lang];
+  const currentImages = portfolioData[activeCategory] || [];
+
+  useEffect(() => {
+    setSelectedIndex(null);
+  }, [activeCategory]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (selectedIndex === null) return;
+
+      if (e.key === "Escape") setSelectedIndex(null);
+      if (e.key === "ArrowRight") {
+        setSelectedIndex((prev) =>
+          prev === null ? 0 : (prev + 1) % currentImages.length
+        );
+      }
+      if (e.key === "ArrowLeft") {
+        setSelectedIndex((prev) =>
+          prev === null
+            ? 0
+            : (prev - 1 + currentImages.length) % currentImages.length
+        );
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedIndex, currentImages.length]);
+
+  useEffect(() => {
+    document.body.style.overflow = selectedIndex !== null ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedIndex]);
 
   const availablePackages = useMemo(() => {
     if (service === "wedding") return ["half", "full", "premium"];
-    if (service === "baptism") return ["mini", "basic", "premium"];
     return ["mini", "basic", "premium"];
   }, [service]);
 
@@ -325,6 +368,20 @@ export default function Page() {
 
   const handleExtraToggle = (key) => {
     setExtras((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const showPrevImage = () => {
+    if (!currentImages.length) return;
+    setSelectedIndex((prev) =>
+      prev === null ? 0 : (prev - 1 + currentImages.length) % currentImages.length
+    );
+  };
+
+  const showNextImage = () => {
+    if (!currentImages.length) return;
+    setSelectedIndex((prev) =>
+      prev === null ? 0 : (prev + 1) % currentImages.length
+    );
   };
 
   const whatsappLink = "https://wa.me/41793347799";
@@ -348,6 +405,7 @@ export default function Page() {
                   key={code}
                   className={`lang-btn ${lang === code ? "active" : ""}`}
                   onClick={() => setLang(code)}
+                  type="button"
                 >
                   {code.toUpperCase()}
                 </button>
@@ -390,6 +448,7 @@ export default function Page() {
                     activeCategory === key ? "active" : ""
                   }`}
                   onClick={() => setActiveCategory(key)}
+                  type="button"
                 >
                   {label}
                 </button>
@@ -397,14 +456,16 @@ export default function Page() {
             </div>
 
             <div className="gallery-grid">
-              {portfolioData[activeCategory]?.map((src, index) => (
+              {currentImages.map((src, index) => (
                 <button
                   type="button"
                   className="gallery-card gallery-button"
                   key={`${src}-${index}`}
-                  onClick={() => setSelectedImage(src)}
+                  onClick={() => setSelectedIndex(index)}
+                  aria-label={`Abrir imagem ${index + 1}`}
                 >
                   <img src={src} alt={`${activeCategory}-${index + 1}`} />
+                  <span className="gallery-overlay">Ver foto</span>
                 </button>
               ))}
             </div>
@@ -586,20 +647,46 @@ export default function Page() {
         </div>
       </main>
 
-      {selectedImage && (
-        <div className="lightbox-overlay" onClick={() => setSelectedImage(null)}>
+      {selectedIndex !== null && currentImages[selectedIndex] && (
+        <div
+          className="lightbox-overlay"
+          onClick={() => setSelectedIndex(null)}
+        >
           <div
             className="lightbox-content"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              type="button"
-              className="lightbox-close"
-              onClick={() => setSelectedImage(null)}
-            >
-              × {t.close}
-            </button>
-            <img src={selectedImage} alt="portfolio-large" className="lightbox-image" />
+            <div className="lightbox-top">
+              <button
+                type="button"
+                className="lightbox-nav"
+                onClick={showPrevImage}
+              >
+                ← {t.previous}
+              </button>
+
+              <button
+                type="button"
+                className="lightbox-close"
+                onClick={() => setSelectedIndex(null)}
+              >
+                × {t.close}
+              </button>
+
+              <button
+                type="button"
+                className="lightbox-nav"
+                onClick={showNextImage}
+              >
+                {t.next} →
+              </button>
+            </div>
+
+            <img
+              src={currentImages[selectedIndex]}
+              alt="portfolio-large"
+              className="lightbox-image"
+            />
           </div>
         </div>
       )}
