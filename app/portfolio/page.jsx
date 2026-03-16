@@ -130,7 +130,7 @@ export default function PortfolioPage() {
           <header className="topbar portfolio-topbar">
             <Link href="/" className="brand-wrap" aria-label="Dream Studio Grenchen home">
               <img
-                src="/logo-dream-studio.png"
+                src="/logo-dream-studio.jpg"
                 alt="Dream Studio Grenchen by Paulo Alves"
                 className="brand-logo"
               />
