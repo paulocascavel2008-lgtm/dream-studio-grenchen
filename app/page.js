@@ -471,7 +471,7 @@ export default function Page() {
 
   const t = translations[lang];
   const currentImages = portfolioData[activeCategory] || [];
-  const previewImages = useMemo(() => currentImages.slice(0, 6), [currentImages]);
+  const previewImages = useMemo(() => currentImages.slice(0, 12), [currentImages]);
 
   useEffect(() => {
     setSelectedIndex(null);
