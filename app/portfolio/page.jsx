@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -7,104 +6,162 @@ import { portfolioData } from "../../lib/portfolio";
 
 const translations = {
   pt: {
-    title: "Portfólio",
-    text: "Explore o portfólio por categoria. Clique numa imagem para abrir em grande.",
-    backHome: "Voltar à página inicial",
+    langLabel: "PORTUGUÊS",
+    title: "Portfólio Completo",
+    subtitle:
+      "Explore todas as galerias do Dream Studio Grenchen por categoria.",
+    backHome: "Voltar à página principal",
+    galleryHint: "Clique para abrir",
     close: "Fechar",
     previous: "Anterior",
     next: "Seguinte",
-    galleryHint: "Clique para abrir",
+    empty: "Ainda não há imagens disponíveis nesta categoria.",
     categories: {
       studio: "Estúdio",
       outdoor: "Exterior",
       wedding: "Casamentos",
       baptism: "Batizados",
-      landscape: "Paisagens",
+      landscape: "Paisagem",
       family: "Família",
     },
   },
   de: {
-    title: "Portfolio",
-    text: "Entdecken Sie das Portfolio nach Kategorien. Klicken Sie auf ein Bild, um es groß zu öffnen.",
+    langLabel: "DEUTSCH",
+    title: "Komplettes Portfolio",
+    subtitle:
+      "Entdecken Sie alle Galerien von Dream Studio Grenchen nach Kategorie.",
     backHome: "Zurück zur Startseite",
+    galleryHint: "Zum Öffnen klicken",
     close: "Schließen",
     previous: "Zurück",
     next: "Weiter",
-    galleryHint: "Zum Öffnen klicken",
+    empty: "In dieser Kategorie sind noch keine Bilder verfügbar.",
     categories: {
       studio: "Studio",
       outdoor: "Outdoor",
       wedding: "Hochzeiten",
       baptism: "Taufen",
-      landscape: "Landschaften",
+      landscape: "Landschaft",
       family: "Familie",
     },
   },
   fr: {
-    title: "Portfolio",
-    text: "Découvrez le portfolio par catégorie. Cliquez sur une image pour l’ouvrir en grand.",
-    backHome: "Retour à l’accueil",
+    langLabel: "FRANÇAIS",
+    title: "Portfolio Complet",
+    subtitle:
+      "Découvrez toutes les galeries de Dream Studio Grenchen par catégorie.",
+    backHome: "Retour à la page d’accueil",
+    galleryHint: "Cliquer pour ouvrir",
     close: "Fermer",
     previous: "Précédent",
     next: "Suivant",
-    galleryHint: "Cliquer pour ouvrir",
+    empty: "Aucune image disponible pour cette catégorie pour le moment.",
     categories: {
       studio: "Studio",
       outdoor: "Extérieur",
       wedding: "Mariages",
       baptism: "Baptêmes",
-      landscape: "Paysages",
+      landscape: "Paysage",
       family: "Famille",
     },
   },
   it: {
-    title: "Portfolio",
-    text: "Esplora il portfolio per categoria. Clicca su un’immagine per aprirla in grande.",
-    backHome: "Torna alla home",
+    langLabel: "ITALIANO",
+    title: "Portfolio Completo",
+    subtitle:
+      "Esplora tutte le gallerie di Dream Studio Grenchen per categoria.",
+    backHome: "Torna alla pagina principale",
+    galleryHint: "Clicca per aprire",
     close: "Chiudi",
     previous: "Precedente",
     next: "Successiva",
-    galleryHint: "Clicca per aprire",
+    empty: "Non ci sono ancora immagini disponibili in questa categoria.",
     categories: {
       studio: "Studio",
       outdoor: "Esterno",
       wedding: "Matrimoni",
       baptism: "Battesimi",
-      landscape: "Paesaggi",
+      landscape: "Paesaggio",
       family: "Famiglia",
     },
   },
 };
 
+const categoryOrder = [
+  "studio",
+  "outdoor",
+  "wedding",
+  "baptism",
+  "landscape",
+  "family",
+];
+
 export default function PortfolioPage() {
   const [lang, setLang] = useState("pt");
   const [activeCategory, setActiveCategory] = useState("studio");
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [validImages, setValidImages] = useState([]);
 
   const t = translations[lang];
-  const currentImages = useMemo(() => portfolioData[activeCategory] || [], [activeCategory]);
+  const currentImages = portfolioData[activeCategory] || [];
 
   useEffect(() => {
+    let cancelled = false;
+
+    const checkImages = async () => {
+      const results = await Promise.all(
+        currentImages.map(
+          (src) =>
+            new Promise((resolve) => {
+              const img = new Image();
+              img.src = src;
+              img.onload = () => resolve(src);
+              img.onerror = () => resolve(null);
+            })
+        )
+      );
+
+      if (!cancelled) {
+        setValidImages(results.filter(Boolean));
+      }
+    };
+
+    checkImages();
     setSelectedIndex(null);
-  }, [activeCategory]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeCategory, currentImages]);
+
+  const previewImages = useMemo(() => validImages, [validImages]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (selectedIndex === null) return;
-      if (e.key === "Escape") setSelectedIndex(null);
-      if (e.key === "ArrowRight") {
-        setSelectedIndex((prev) => (prev === null ? 0 : (prev + 1) % currentImages.length));
+      if (selectedIndex === null || !previewImages.length) return;
+
+      if (e.key === "Escape") {
+        setSelectedIndex(null);
       }
+
+      if (e.key === "ArrowRight") {
+        setSelectedIndex((prev) =>
+          prev === null ? 0 : (prev + 1) % previewImages.length
+        );
+      }
+
       if (e.key === "ArrowLeft") {
         setSelectedIndex((prev) =>
-          prev === null ? 0 : (prev - 1 + currentImages.length) % currentImages.length
+          prev === null
+            ? 0
+            : (prev - 1 + previewImages.length) % previewImages.length
         );
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedIndex, currentImages.length]);
+  }, [selectedIndex, previewImages.length]);
 
   useEffect(() => {
     document.body.style.overflow = selectedIndex !== null ? "hidden" : "";
@@ -114,20 +171,24 @@ export default function PortfolioPage() {
   }, [selectedIndex]);
 
   const showPrevImage = () => {
-    if (!currentImages.length) return;
-    setSelectedIndex((prev) => (prev === null ? 0 : (prev - 1 + currentImages.length) % currentImages.length));
+    if (!previewImages.length) return;
+    setSelectedIndex((prev) =>
+      prev === null ? 0 : (prev - 1 + previewImages.length) % previewImages.length
+    );
   };
 
   const showNextImage = () => {
-    if (!currentImages.length) return;
-    setSelectedIndex((prev) => (prev === null ? 0 : (prev + 1) % currentImages.length));
+    if (!previewImages.length) return;
+    setSelectedIndex((prev) =>
+      prev === null ? 0 : (prev + 1) % previewImages.length
+    );
   };
 
   return (
     <>
       <main className="site-shell">
         <div className="page-container">
-          <header className="topbar portfolio-topbar">
+          <header className="topbar">
             <Link href="/" className="brand-wrap" aria-label="Dream Studio Grenchen home">
               <img
                 src="/logo-dream-studio.jpg"
@@ -136,82 +197,116 @@ export default function PortfolioPage() {
               />
             </Link>
 
-            <div className="portfolio-actions">
-              <div className="lang-switch">
-                {["pt", "de", "fr", "it"].map((code) => (
-                  <button
-                    key={code}
-                    className={`lang-btn ${lang === code ? "active" : ""}`}
-                    onClick={() => setLang(code)}
-                    type="button"
-                  >
-                    {code.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-
-              <Link href="/" className="secondary-btn">
-                {t.backHome}
-              </Link>
+            <div className="lang-switch">
+              {["pt", "de", "fr", "it"].map((code) => (
+                <button
+                  key={code}
+                  className={`lang-btn ${lang === code ? "active" : ""}`}
+                  onClick={() => setLang(code)}
+                  type="button"
+                >
+                  {code.toUpperCase()}
+                </button>
+              ))}
             </div>
           </header>
 
-          <section className="hero-card">
-            <p className="section-kicker">{t.title.toUpperCase()}</p>
-            <h1 className="portfolio-title">{t.title}</h1>
-            <p className="portfolio-text">{t.text}</p>
+          <section className="hero-card" id="top">
+            <div className="hero-grid">
+              <div className="hero-text">
+                <p className="section-kicker">{t.langLabel}</p>
+                <h1>{t.title}</h1>
+                <h2>{t.subtitle}</h2>
+
+                <div className="hero-actions">
+                  <Link className="secondary-btn" href="/">
+                    {t.backHome}
+                  </Link>
+                </div>
+              </div>
+
+              <div className="hero-side-card">
+                <img
+                  src="/hero-photo.jpg"
+                  alt="Dream Studio Grenchen portfolio"
+                  className="hero-feature-image"
+                />
+              </div>
+            </div>
           </section>
 
           <section className="section-card">
             <div className="category-row">
-              {Object.entries(t.categories)
-                .filter(([key]) => portfolioData[key])
-                .map(([key, label]) => (
+              {categoryOrder
+                .filter((key) => portfolioData[key])
+                .map((key) => (
                   <button
                     key={key}
-                    type="button"
                     className={`category-btn ${activeCategory === key ? "active" : ""}`}
                     onClick={() => setActiveCategory(key)}
+                    type="button"
                   >
-                    {label}
+                    {t.categories[key]}
                   </button>
                 ))}
             </div>
 
-            <div className="portfolio-gallery-grid">
-              {currentImages.map((src, index) => (
-                <button
-                  type="button"
-                  className="gallery-card gallery-button"
-                  key={`${src}-${index}`}
-                  onClick={() => setSelectedIndex(index)}
-                  aria-label={`${t.galleryHint} ${index + 1}`}
-                >
-                  <img src={src} alt={`${activeCategory}-${index + 1}`} loading="lazy" />
-                  <span className="gallery-overlay">{t.galleryHint}</span>
-                </button>
-              ))}
-            </div>
+            {previewImages.length === 0 ? (
+              <p style={{ marginTop: "1rem" }}>{t.empty}</p>
+            ) : (
+              <div className="gallery-grid">
+                {previewImages.map((src, index) => (
+                  <button
+                    type="button"
+                    className="gallery-card gallery-button"
+                    key={`${src}-${index}`}
+                    onClick={() => setSelectedIndex(index)}
+                    aria-label={`${t.galleryHint} ${index + 1}`}
+                  >
+                    <img
+                      src={src}
+                      alt={`${activeCategory}-${index + 1}`}
+                      loading="lazy"
+                    />
+                    <span className="gallery-overlay">{t.galleryHint}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </section>
+
+          <footer className="footer">
+            <p>Dream Studio Grenchen • Paulo Alves</p>
+          </footer>
         </div>
       </main>
 
-      {selectedIndex !== null && currentImages[selectedIndex] && (
+      {selectedIndex !== null && previewImages[selectedIndex] && (
         <div className="lightbox-overlay" onClick={() => setSelectedIndex(null)}>
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
             <div className="lightbox-top">
               <button type="button" className="lightbox-nav" onClick={showPrevImage}>
                 ← {t.previous}
               </button>
-              <button type="button" className="lightbox-close" onClick={() => setSelectedIndex(null)}>
+
+              <button
+                type="button"
+                className="lightbox-close"
+                onClick={() => setSelectedIndex(null)}
+              >
                 × {t.close}
               </button>
+
               <button type="button" className="lightbox-nav" onClick={showNextImage}>
                 {t.next} →
               </button>
             </div>
 
-            <img src={currentImages[selectedIndex]} alt="portfolio-large" className="lightbox-image" />
+            <img
+              src={previewImages[selectedIndex]}
+              alt="portfolio-large"
+              className="lightbox-image"
+            />
           </div>
         </div>
       )}
