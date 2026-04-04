@@ -468,22 +468,52 @@ export default function Page() {
   const [activeCategory, setActiveCategory] = useState("studio");
   const [openPrice, setOpenPrice] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [validImages, setValidImages] = useState([]);
 
   const t = translations[lang];
   const currentImages = portfolioData[activeCategory] || [];
-  const previewImages = useMemo(() => currentImages.slice(0, 12), [currentImages]);
 
   useEffect(() => {
+    let cancelled = false;
+
+    const checkImages = async () => {
+      const results = await Promise.all(
+        currentImages.map(
+          (src) =>
+            new Promise((resolve) => {
+              const img = new Image();
+              img.src = src;
+              img.onload = () => resolve(src);
+              img.onerror = () => resolve(null);
+            })
+        )
+      );
+
+      if (!cancelled) {
+        setValidImages(results.filter(Boolean));
+      }
+    };
+
+    checkImages();
     setSelectedIndex(null);
-  }, [activeCategory]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeCategory, currentImages]);
+
+  const previewImages = useMemo(() => validImages, [validImages]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (selectedIndex === null) return;
+      if (selectedIndex === null || !previewImages.length) return;
+
       if (e.key === "Escape") setSelectedIndex(null);
+
       if (e.key === "ArrowRight") {
         setSelectedIndex((prev) => (prev === null ? 0 : (prev + 1) % previewImages.length));
       }
+
       if (e.key === "ArrowLeft") {
         setSelectedIndex((prev) =>
           prev === null ? 0 : (prev - 1 + previewImages.length) % previewImages.length
@@ -493,7 +523,7 @@ export default function Page() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedIndex, previewImages.length]);
+  }, [selectedIndex, previewImages]);
 
   useEffect(() => {
     document.body.style.overflow = selectedIndex !== null ? "hidden" : "";
